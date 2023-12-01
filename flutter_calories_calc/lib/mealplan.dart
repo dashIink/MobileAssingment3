@@ -58,28 +58,41 @@ class _MealPlanScreenState extends State<MealPlanScreen> {
     });
   }
 
-  Future<void> _insertMealPlan() async {//When the user taps on add meal plan, take the selected foods marked by a checkmark and add them to the database
-    List<int> selectedFoodIds = [];
-    for (int i = 0; i < foodItems.length; i++) {
-      if (checkboxStates[i]) {
-        selectedFoodIds.add(foodItems[i]['id'] as int);
+  Future<void> _insertMealPlan() async {
+    //When the user taps on add meal plan, take the selected foods marked by a checkmark and add them to the database
+    if (textColor == Colors.black) {
+      List<int> selectedFoodIds = [];
+      for (int i = 0; i < foodItems.length; i++) {
+        if (checkboxStates[i]) {
+          selectedFoodIds.add(foodItems[i]['id'] as int);
+        }
       }
-    }
-    await DatabaseHelper().deleteMealPlan(selectedDate);//Clear any mealplan for this date, there should be only one mealplan able to be created each day
 
-    Map<String, dynamic> newMealPlan = {
-      'date': dateController.text,
-    };
-    //Insert our meal plan into database
-    int insertedMealPlanId = await DatabaseHelper().insertMealPlan(newMealPlan);
-    //Insert the meal plan items into the database, using the ID of the meal plan and the ID of the food value to make a table that holds both.
-    for (int foodId in selectedFoodIds) {
-      await DatabaseHelper().insertMealPlanFoodItem(
-          {'meal_plan_id': insertedMealPlanId, 'food_id': foodId}
+      await DatabaseHelper().deleteMealPlan(
+          selectedDate); //Clear any mealplan for this date, there should be only one mealplan able to be created each day
+
+      Map<String, dynamic> newMealPlan = {
+        'date': dateController.text,
+      };
+      //Insert our meal plan into database
+      int insertedMealPlanId = await DatabaseHelper().insertMealPlan(
+          newMealPlan);
+      //Insert the meal plan items into the database, using the ID of the meal plan and the ID of the food value to make a table that holds both.
+      for (int foodId in selectedFoodIds) {
+        await DatabaseHelper().insertMealPlanFoodItem(
+            {'meal_plan_id': insertedMealPlanId, 'food_id': foodId}
+        );
+      }
+
+      print('Inserted Meal Plan ID: $insertedMealPlanId');
+    }
+    else{
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Cannot insert meal plan. Too many Calories.'),
+        ),
       );
     }
-
-    print('Inserted Meal Plan ID: $insertedMealPlanId');
   }
 
   void _checkSelectedItemsForDate() async {//Get today as a mealplan, if items are found, check the corrisponding box off

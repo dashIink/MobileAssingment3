@@ -62,7 +62,11 @@ void _handleUpdateAction(BuildContext context, String date) {
 }
 
 void showNoMealPlanDialog(BuildContext context) {
-
+  ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(
+      content: Text('No Meal Plan to display.'),
+    ),
+  );
 }
 
 void showDateEmptyDialog(BuildContext context) {
